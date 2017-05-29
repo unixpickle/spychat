@@ -14,6 +14,42 @@ const (
 	sessionGracePeriod    = time.Hour
 )
 
+// A SessionTable maintains a mapping of unique IDs to
+// sessions.
+type SessionTable struct {
+	lock  sync.RWMutex
+	curID int64
+	table map[int64]*Session
+}
+
+// NewSessionTable creates an empty SessionTable.
+func NewSessionTable() *SessionTable {
+	return &SessionTable{table: map[int64]*Session{}}
+}
+
+// Add adds a session and returns its ID.
+func (s *SessionTable) Add(sess *Session) int64 {
+	s.lock.Lock()
+	defer s.lock.Unlock()
+	s.curID++
+	s.table[s.curID] = sess
+	return s.curID
+}
+
+// Get gets a session by its ID.
+func (s *SessionTable) Get(i int64) *Session {
+	s.lock.RLock()
+	defer s.lock.RUnlock()
+	return s.table[i]
+}
+
+// Del deletes a session.
+func (s *SessionTable) Del(i int64) {
+	s.lock.Lock()
+	delete(s.table, i)
+	s.lock.Unlock()
+}
+
 // A Session manages a session on Facebook Messenger and
 // multiplexes the event stream for multiple clients.
 type Session struct {
