@@ -28,6 +28,18 @@ type Session struct {
 	isListening   bool
 }
 
+// NewSession authenticates a new session.
+func NewSession(user, password string) (*Session, error) {
+	res := &Session{
+		username: user,
+		password: password,
+	}
+	if _, err := res.Session(); err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
 // Session returns the current underlying *fbmsgr.Session
 // for interacting with Messenger.
 // This may change between consecutive calls.
