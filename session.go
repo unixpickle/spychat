@@ -1,4 +1,4 @@
-package spychat
+package main
 
 import (
 	"io"
