@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     version="1.1"
+     viewBox="0 0 650 125">
+  <defs>
+    <mask id="crop-mask">
+      <rect fill="white" x="0" y="0" width="650" height="125" />
+    </mask>
+    <path id="finger" fill="#ffdf5d" d="M0,130 v-60 a10,10 0 0 1 20,0 v60" />
+    <g id="hand">
+      <use xlink:href="#finger" transform="scale(0.8 1) translate(0 25)" />
+      <use xlink:href="#finger" transform="translate(21 10)" />
+      <use xlink:href="#finger" transform="translate(48 0)" />
+      <use xlink:href="#finger" transform="translate(73 10)" />
+    </g>
+    <path id="half-glass" fill="#494949"
+          d="M193,85 v8 q11,4 16,32 h100 c0,-20 10,-25 17,-25 v-8 c-30,0 -75,-26 -133,-7" />
+  </defs>
+  <g mask="url(#crop-mask)">
+    <use xlink:href="#hand" transform="translate(47 15) rotate(20)" />
+    <g transform="translate(651 0) scale(-1 1)">
+      <use xlink:href="#hand" transform="translate(47 15) rotate(20)" />
+    </g>
+    <circle fill="#ffdf5d" cx="325" cy="140" r="140" />
+    <use xlink:href="#half-glass" />
+    <use xlink:href="#half-glass" transform="translate(651 0) scale(-1 1)" />
+  </g>
+</svg>

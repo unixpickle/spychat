@@ -76,7 +76,7 @@ func (s *Server) Root(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) Login(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
-		user := r.FormValue("user")
+		user := r.FormValue("username")
 		password := r.FormValue("password")
 		sess, err := NewSession(user, password)
 		if err != nil {
