@@ -29,14 +29,20 @@ func (r *realSession) Login(username, password string) error {
 	return err
 }
 
-func (r *realSession) Chats() ([]*fbmsgr.ThreadInfo, []*fbmsgr.ParticipantInfo, error) {
-	// TODO: this.
-	panic("nyi")
+func (r *realSession) Threads() ([]*fbmsgr.ThreadInfo, error) {
+	sess, err := r.rawSession()
+	if err != nil {
+		return nil, err
+	}
+	return sess.AllThreads()
 }
 
 func (r *realSession) Thread(id string) ([]fbmsgr.Action, error) {
-	// TODO: this.
-	panic("nyi")
+	sess, err := r.rawSession()
+	if err != nil {
+		return nil, err
+	}
+	return sess.ActionLog(id, time.Time{}, 100)
 }
 
 // rawSession returns the current underlying session for

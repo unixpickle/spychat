@@ -1,37 +1,44 @@
 package main
 
 import (
+	"encoding/json"
 	"errors"
+	"io/ioutil"
 
+	"github.com/unixpickle/essentials"
 	"github.com/unixpickle/fbmsgr"
 )
 
 // NewMockSession creates a Session that uses a mocked
 // version of Facebook Messenger.
-func NewMockSession() Session {
-	return &mockSession{}
+func NewMockSession(configPath string) Session {
+	data, err := ioutil.ReadFile(configPath)
+	essentials.Must(err)
+	var res mockSession
+	essentials.Must(essentials.AddCtx("parse mock session", json.Unmarshal(data, &res)))
+	return &res
 }
 
 type mockSession struct {
-	username string
-	password string
+	ThreadsResult []*fbmsgr.ThreadInfo    `json:"threads"`
+	ThreadResult  []*fbmsgr.GenericAction `json:"thread"`
 }
 
 func (m *mockSession) Login(username, password string) error {
 	if username == "username" && password == "password" {
-		m.username = username
-		m.password = password
 		return nil
 	}
 	return errors.New("login incorrect")
 }
 
-func (m *mockSession) Chats() ([]*fbmsgr.ThreadInfo, []*fbmsgr.ParticipantInfo, error) {
-	// TODO: this.
-	panic("nyi")
+func (m *mockSession) Threads() ([]*fbmsgr.ThreadInfo, error) {
+	return m.ThreadsResult, nil
 }
 
 func (m *mockSession) Thread(id string) ([]fbmsgr.Action, error) {
-	// TODO: this.
-	panic("nyi")
+	res := make([]fbmsgr.Action, len(m.ThreadResult))
+	for i, x := range m.ThreadResult {
+		res[i] = x
+	}
+	return res, nil
 }

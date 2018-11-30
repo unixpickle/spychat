@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"html/template"
 	"log"
@@ -19,7 +20,7 @@ type ServerFlags struct {
 	Port        int
 	AssetDir    string
 	TemplateDir string
-	Mock        bool
+	Mock        string
 }
 
 func main() {
@@ -27,7 +28,7 @@ func main() {
 	flag.IntVar(&flags.Port, "port", 8080, "server port number")
 	flag.StringVar(&flags.AssetDir, "assets", "assets", "asset directory")
 	flag.StringVar(&flags.TemplateDir, "templates", "templates", "template directory")
-	flag.BoolVar(&flags.Mock, "mock", false, "mock the messenger backend")
+	flag.StringVar(&flags.Mock, "mock", "", "path to mock data JSON file")
 	flag.Parse()
 
 	server := &Server{
@@ -39,8 +40,10 @@ func main() {
 	http.Handle("/assets/", context.ClearHandler(server.AssetHandler()))
 
 	handlers := map[string]http.HandlerFunc{
-		"/":      server.HandleRoot,
-		"/login": server.HandleLogin,
+		"/":        server.HandleRoot,
+		"/login":   server.HandleLogin,
+		"/threads": server.HandleThreads,
+		"/thread":  server.HandleThread,
 	}
 	for path, handler := range handlers {
 		http.Handle(path, context.ClearHandler(handler))
@@ -76,7 +79,6 @@ func (s *Server) HandleRoot(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// HandleLogin serves the login page.
 func (s *Server) HandleLogin(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
 		user := r.FormValue("username")
@@ -99,6 +101,50 @@ func (s *Server) HandleLogin(w http.ResponseWriter, r *http.Request) {
 	s.serveTemplate(w, "login", map[string]string{"error": r.FormValue("error")})
 }
 
+func (s *Server) HandleThreads(w http.ResponseWriter, r *http.Request) {
+	if !s.authenticated(r) {
+		http.Error(w, `{"error": "not authenticated"}`, http.StatusForbidden)
+		return
+	}
+	sess, _ := s.CookieStore.Get(r, "sessid")
+	id := sess.Values["id"].(int64)
+	session := s.SessionTable.Get(id)
+
+	result, err := session.Threads()
+	msg := map[string]interface{}{}
+	if err != nil {
+		msg["error"] = err.Error()
+	} else {
+		msg["result"] = result
+	}
+	data, _ := json.Marshal(msg)
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(data)
+}
+
+func (s *Server) HandleThread(w http.ResponseWriter, r *http.Request) {
+	if !s.authenticated(r) {
+		http.Error(w, `{"error": "not authenticated"}`, http.StatusForbidden)
+		return
+	}
+	threadID := r.FormValue("thread")
+
+	sess, _ := s.CookieStore.Get(r, "sessid")
+	id := sess.Values["id"].(int64)
+	session := s.SessionTable.Get(id)
+
+	actions, err := session.Thread(threadID)
+	msg := map[string]interface{}{}
+	if err != nil {
+		msg["error"] = err.Error()
+	} else {
+		msg["result"] = actions
+	}
+	data, _ := json.Marshal(msg)
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(data)
+}
+
 func (s *Server) serveTemplate(w http.ResponseWriter, name string, data interface{}) {
 	path := filepath.Join(s.Flags.TemplateDir, name+".html")
 	temp, err := template.New(name + ".html").ParseFiles(path)
@@ -119,8 +165,8 @@ func (s *Server) authenticated(r *http.Request) bool {
 }
 
 func (s *Server) newSession() Session {
-	if s.Flags.Mock {
-		return NewMockSession()
+	if s.Flags.Mock != "" {
+		return NewMockSession(s.Flags.Mock)
 	} else {
 		return NewRealSession()
 	}

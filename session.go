@@ -52,6 +52,6 @@ func (s *SessionTable) Del(i int64) {
 // A Session is an abstract source of conversations.
 type Session interface {
 	Login(username, password string) error
-	Chats() ([]*fbmsgr.ThreadInfo, []*fbmsgr.ParticipantInfo, error)
+	Threads() ([]*fbmsgr.ThreadInfo, error)
 	Thread(id string) ([]fbmsgr.Action, error)
 }
