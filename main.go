@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"net/url"
 	"path/filepath"
 	"strconv"
 
@@ -18,6 +19,7 @@ type ServerFlags struct {
 	Port        int
 	AssetDir    string
 	TemplateDir string
+	Mock        bool
 }
 
 func main() {
@@ -25,6 +27,7 @@ func main() {
 	flag.IntVar(&flags.Port, "port", 8080, "server port number")
 	flag.StringVar(&flags.AssetDir, "assets", "assets", "asset directory")
 	flag.StringVar(&flags.TemplateDir, "templates", "templates", "template directory")
+	flag.BoolVar(&flags.Mock, "mock", false, "mock the messenger backend")
 	flag.Parse()
 
 	server := &Server{
@@ -66,11 +69,34 @@ func (s *Server) HandleRoot(w http.ResponseWriter, r *http.Request) {
 		s.serveTemplate(w, "404", map[string]string{"path": r.URL.Path})
 		return
 	}
-	if s.Authenticated(r) {
+	if s.authenticated(r) {
 		s.serveTemplate(w, "index", nil)
 	} else {
 		http.Redirect(w, r, "/login", http.StatusSeeOther)
 	}
+}
+
+// HandleLogin serves the login page.
+func (s *Server) HandleLogin(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "POST" {
+		user := r.FormValue("username")
+		password := r.FormValue("password")
+		sess := s.newSession()
+		if err := sess.Login(user, password); err != nil {
+			http.Redirect(w, r, "/login?error="+url.QueryEscape(err.Error()),
+				http.StatusSeeOther)
+			return
+		}
+		id := s.SessionTable.Add(sess)
+		rawSess, _ := s.CookieStore.Get(r, "sessid")
+		rawSess.Values["authenticated"] = true
+		rawSess.Values["id"] = id
+		rawSess.Save(r, w)
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+
+	s.serveTemplate(w, "login", map[string]string{"error": r.FormValue("error")})
 }
 
 func (s *Server) serveTemplate(w http.ResponseWriter, name string, data interface{}) {
@@ -83,5 +109,19 @@ func (s *Server) serveTemplate(w http.ResponseWriter, name string, data interfac
 	}
 	if err := temp.Execute(w, data); err != nil {
 		log.Println("error in template execution:", err)
+	}
+}
+
+func (s *Server) authenticated(r *http.Request) bool {
+	sess, _ := s.CookieStore.Get(r, "sessid")
+	val, _ := sess.Values["authenticated"].(bool)
+	return val
+}
+
+func (s *Server) newSession() Session {
+	if s.Flags.Mock {
+		return NewMockSession()
+	} else {
+		return NewRealSession()
 	}
 }
