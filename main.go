@@ -5,7 +5,6 @@ import (
 	"html/template"
 	"log"
 	"net/http"
-	"net/url"
 	"path/filepath"
 	"strconv"
 
@@ -37,8 +36,8 @@ func main() {
 	http.Handle("/assets/", context.ClearHandler(server.AssetHandler()))
 
 	handlers := map[string]http.HandlerFunc{
-		"/":      server.Root,
-		"/login": server.Login,
+		"/":      server.HandleRoot,
+		"/login": server.HandleLogin,
 	}
 	for path, handler := range handlers {
 		http.Handle(path, context.ClearHandler(handler))
@@ -62,43 +61,21 @@ func (s *Server) AssetHandler() http.Handler {
 	return http.StripPrefix("/assets/", http.FileServer(http.Dir(s.Flags.AssetDir)))
 }
 
-func (s *Server) Root(w http.ResponseWriter, r *http.Request) {
+func (s *Server) HandleRoot(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
 		s.serveTemplate(w, "404", map[string]string{"path": r.URL.Path})
 		return
 	}
-	if s.authenticated(r) {
+	if s.Authenticated(r) {
 		s.serveTemplate(w, "index", nil)
 	} else {
 		http.Redirect(w, r, "/login", http.StatusSeeOther)
 	}
 }
 
-func (s *Server) Login(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "POST" {
-		user := r.FormValue("username")
-		password := r.FormValue("password")
-		sess, err := NewSession(user, password)
-		if err != nil {
-			http.Redirect(w, r, "/login?error="+url.QueryEscape(err.Error()),
-				http.StatusSeeOther)
-			return
-		}
-		id := s.SessionTable.Add(sess)
-		rawSess, _ := s.CookieStore.Get(r, "sessid")
-		rawSess.Values["authenticated"] = true
-		rawSess.Values["id"] = id
-		rawSess.Save(r, w)
-		http.Redirect(w, r, "/", http.StatusSeeOther)
-		return
-	}
-
-	s.serveTemplate(w, "login", map[string]string{"error": r.FormValue("error")})
-}
-
 func (s *Server) serveTemplate(w http.ResponseWriter, name string, data interface{}) {
 	path := filepath.Join(s.Flags.TemplateDir, name+".html")
-	temp, err := template.New(name).ParseFiles(path)
+	temp, err := template.New(name + ".html").ParseFiles(path)
 	if err != nil {
 		log.Println("error in template load:", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -107,10 +84,4 @@ func (s *Server) serveTemplate(w http.ResponseWriter, name string, data interfac
 	if err := temp.Execute(w, data); err != nil {
 		log.Println("error in template execution:", err)
 	}
-}
-
-func (s *Server) authenticated(r *http.Request) bool {
-	sess, _ := s.CookieStore.Get(r, "sessid")
-	val, _ := sess.Values["authenticated"].(bool)
-	return val
 }
