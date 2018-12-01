@@ -18,7 +18,6 @@ class Messages extends LoadableView {
       if (!msg['Body'] && !msg['Attachments']) {
         return;
       }
-
       const info = this.userInfo((msg['RawData']['message_sender'] || {})['id']);
 
       const iconElem = document.createElement('img');
@@ -31,7 +30,42 @@ class Messages extends LoadableView {
 
       const bodyElem = document.createElement('div');
       bodyElem.className = 'message-body';
-      bodyElem.textContent = msg['Body'];
+      bodyElem.innerHTML = escapeBody(msg['Body']);
+
+      (msg['Attachments'] || []).forEach((attachment) => {
+        let attachElem = null;
+        if (attachment['HiResURL']) {
+          attachElem = document.createElement('img');
+          attachElem.className = 'message-attachment-image';
+          attachElem.src = attachment['HiResURL'];
+        } else if (attachment['AudioURL']) {
+          attachElem = document.createElement('audio');
+          attachElem.className = 'message-attachment-audio';
+          attachElem.controls = 'controls';
+          attachElem.src = attachment['AudioURL'];
+        } else if (attachment['VideoURL']) {
+          attachElem = document.createElement('video');
+          attachElem.className = 'message-attachment-video';
+          attachElem.controls = 'controls';
+          attachElem.src = attachment['VideoURL'];
+        } else if (attachment['FileURL']) {
+          attachElem = document.createElement('a');
+          attachElem.className = 'message-attachment-file';
+          attachElem.href = attachment['FileURL'];
+          attachElem.textContent = 'Download file (' + attachment['Name'] + ')';
+          attachElem.target = '_blank';
+        } else if (attachment['StickerID']) {
+          attachElem = document.createElement('img');
+          attachElem.className = 'message-attachment-image';
+          attachElem.src = attachment['RawURL'];
+        }
+        if (attachElem) {
+          bodyElem.appendChild(attachElem);
+          attachElem.onload = () => {
+            this.element.scrollTo(0, this.list.offsetHeight);
+          }
+        }
+      });
 
       const messageElem = document.createElement('div');
       messageElem.className = 'message';
@@ -42,7 +76,7 @@ class Messages extends LoadableView {
       this.list.appendChild(messageElem);
     });
 
-    this.element.scrollTo(0, this.list.offsetHeight);
+    this.element.scrollTo(0, this.list.offsetHeight + 100000);
   }
 
   userInfo(fbid) {
@@ -55,4 +89,12 @@ class Messages extends LoadableView {
     });
     return result;
   }
+}
+
+function escapeBody(body) {
+  body = body.replace(/&/g, '&amp;');
+  body = body.replace(/</g, '&lt;');
+  body = body.replace(/>/g, '&gt;');
+  body = body.replace(/\n/g, '<br>');
+  return body;
 }

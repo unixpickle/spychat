@@ -63,3 +63,7 @@
   line-height: 32px;
   color: #65bcd4;
 }
+
+.message-attachment-image, .message-attachment-audio, .message-attachment-video {
+  max-width: 90%;
+}
