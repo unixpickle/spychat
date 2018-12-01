@@ -1,4 +1,4 @@
-class Messages {
+class Messages extends LoadableView {
   constructor() {
     super('messages');
     this.list = this.element.getElementsByClassName('chat-log')[0];
@@ -9,7 +9,7 @@ class Messages {
   }
 
   showResults(messages) {
-    super(messages);
+    super.showResults(messages);
     this.list.innerHTML = '';
   }
 }

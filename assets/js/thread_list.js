@@ -20,7 +20,7 @@ class ThreadList extends LoadableView {
   }
 
   showResult(threads) {
-    super(threads);
+    super.showResult(threads);
 
     this.list.innerHTML = '';
 
