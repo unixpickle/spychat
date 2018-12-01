@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     version="1.1"
+     viewBox="0 0 48 48">
+  <defs>
+    <g id="person" fill="#e3e3e3">
+      <circle cx="0" cy="0" r="5" />
+      <path d="M-8 21 c3,-20 13,-20 16,0 z" />
+    </g>
+  </defs>
+  <rect x="0" y="0" width="100%" height="100%" fill="#f0f0f0" />
+  <use xlink:href="#person" transform="translate(15 15)" />
+  <use xlink:href="#person" transform="translate(33 15)" />
+</svg>
