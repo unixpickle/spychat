@@ -1,34 +1,13 @@
-class ThreadList {
+class ThreadList extends LoadableView {
   constructor() {
-    this.element = document.getElementById('thread-list');
-    this.error = this.element.getElementsByClassName('error')[0];
+    super('thread-list')
     this.list = this.element.getElementsByClassName('threads')[0];
-
     this.onSelectThread = () => null;
-    this.abortController = null;
     this.load();
   }
 
   load() {
-    if (this.abortController) {
-      this.abortController.abort();
-    }
-    this.abortController = new AbortController();
-    fetch('/threads', { signal: this.abortController.signal })
-      .then((response) => response.json())
-      .then((jsonResponse) => {
-        this.abortController = null;
-        if (jsonResponse.error) {
-          this.showError(jsonResponse.error);
-        } else {
-          this.updateThreads(jsonResponse.result);
-        }
-      })
-      .catch(() => {
-        this.abortController = null;
-        this.showError('request failed')
-      });
-    this.showLoader();
+    this.loadPath('/threads');
   }
 
   showError(message) {
@@ -40,7 +19,9 @@ class ThreadList {
     this.element.className = 'loading';
   }
 
-  updateThreads(threads) {
+  showResult(threads) {
+    super(threads);
+
     this.list.innerHTML = '';
 
     const threadElems = [];
@@ -71,8 +52,6 @@ class ThreadList {
         this.onSelectThread(threadInfo);
       }
     });
-
-    this.element.className = 'loaded';
   }
 }
 

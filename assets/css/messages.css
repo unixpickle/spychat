@@ -5,3 +5,20 @@
   box-sizing: border-box;
   overflow-y: scroll;
 }
+
+#messages > * {
+  display: none;
+}
+
+#messages.loading > .loader {
+  display: inline-block;
+  margin: 10px auto;
+}
+
+#messages.failed > .error {
+  display: inline-block;
+}
+
+#messages.loaded > .chat-log {
+  display: block;
+}
