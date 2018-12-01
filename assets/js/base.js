@@ -20,9 +20,9 @@ class LoadableView {
           this.showResult(jsonResponse.result);
         }
       })
-      .catch(() => {
+      .catch((exc) => {
         this.abortController = null;
-        this.showError('request failed')
+        this.showError('request failed: ' + exc);
       });
     this.showLoader();
   }

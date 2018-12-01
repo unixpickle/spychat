@@ -21,8 +21,8 @@ func NewMockSession(configPath string) Session {
 }
 
 type mockSession struct {
-	ThreadsResult []*fbmsgr.ThreadInfo    `json:"threads"`
-	ThreadResult  []*fbmsgr.GenericAction `json:"thread"`
+	ThreadsResult []*fbmsgr.ThreadInfo `json:"threads"`
+	ThreadResult  []mockAction         `json:"thread"`
 }
 
 func (m *mockSession) Login(username, password string) error {
@@ -44,4 +44,30 @@ func (m *mockSession) Thread(id string) ([]fbmsgr.Action, error) {
 		res[i] = x
 	}
 	return res, nil
+}
+
+type mockAction map[string]interface{}
+
+func (m mockAction) ActionType() string {
+	return m.g().ActionType()
+}
+
+func (m mockAction) ActionTime() time.Time {
+	return m.g().ActionTime()
+}
+
+func (m mockAction) MessageID() string {
+	return m.g().MessageID()
+}
+
+func (m mockAction) AuthorFBID() string {
+	return m.g().AuthorFBID()
+}
+
+func (m mockAction) RawFields() map[string]interface{} {
+	return m.g().RawFields()
+}
+
+func (m mockAction) g() *fbmsgr.GenericAction {
+	return &fbmsgr.GenericAction{RawData: m}
 }

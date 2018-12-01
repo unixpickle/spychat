@@ -1,5 +1,6 @@
 #messages {
   position: fixed;
+  height: 100%;
   top: 0;
   right: 0;
   box-sizing: border-box;
@@ -11,7 +12,7 @@
 }
 
 #messages.loading > .loader {
-  display: inline-block;
+  display: block;
   margin: 10px auto;
 }
 
@@ -21,4 +22,44 @@
 
 #messages.loaded > .chat-log {
   display: block;
+}
+
+.chat-log {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.message {
+  padding: 8px;
+}
+
+.message:nth-child(n+1) {
+  border-top: 1px solid #f0f0f0;
+}
+
+.message::after {
+  content: ' ';
+  display: block;
+  clear: both;
+  height: 0;
+}
+
+.message-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 24px;
+  float: left;
+  margin-left: 10px;
+}
+
+.message-name, .message-body {
+  float: right;
+  display: block;
+  width: calc(100% - 70px);
+}
+
+.message-name {
+  line-height: 32px;
+  color: #65bcd4;
 }

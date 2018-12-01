@@ -2,6 +2,7 @@ class App {
   constructor() {
     this.threadList = new ThreadList();
     this.messages = new Messages();
+    this.threadList.onSelectThread = (th) => this.messages.setThread(th);
   }
 }
 

@@ -14,8 +14,7 @@
 }
 
 #thread-list.loading > .loader {
-  display: inline-block;
-  margin: 10px auto;
+  display: block;
 }
 
 #thread-list.failed > .error {
