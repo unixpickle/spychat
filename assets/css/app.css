@@ -5,11 +5,11 @@ body {
 }
 
 #thread-list {
-  width: 320px;
+  width: 250px;
 }
 
 #messages {
-  width: calc(100% - 320px);
+  width: calc(100% - 250px);
 }
 
 @media screen and (max-width: 600px) {

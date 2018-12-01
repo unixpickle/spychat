@@ -58,8 +58,13 @@
 
 .thread-title {
   float: right;
-  line-height: 64px;
-  width: 248px;
-  text-overflow: ellipsis;
+  width: 178px;
   text-align: left;
+
+  line-height: 64px;
+  max-height: 64px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  display: block;
+  word-break: break-all;
 }
