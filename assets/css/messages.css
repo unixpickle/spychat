@@ -1,0 +1,7 @@
+#messages {
+  position: fixed;
+  top: 0;
+  right: 0;
+  box-sizing: border-box;
+  overflow-y: scroll;
+}

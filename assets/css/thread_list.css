@@ -1,0 +1,66 @@
+#thread-list {
+  position: fixed;
+  height: 100%;
+  top: 0;
+  left: 0;
+  box-sizing: border-box;
+  overflow-y: scroll;
+  text-align: center;
+  border-right: 1px solid #cccccc;
+}
+
+#thread-list > * {
+  display: none;
+}
+
+#thread-list.loading > .loader {
+  display: inline-block;
+  margin: 10px auto;
+}
+
+#thread-list.failed > .error {
+  display: inline-block;
+}
+
+#thread-list.loaded > .threads {
+  display: block;
+}
+
+.threads {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.thread, .thread > * {
+  height: 64px;
+  cursor: pointer;
+}
+
+.thread::after {
+  content: ' ';
+  clear: both;
+  display: block;
+  font-size: 0;
+  height: 0;
+}
+
+.thread-current {
+  background-color: #f2f2f2;
+}
+
+.thread-icon {
+  float: left;
+  margin: 8px;
+  width: 48px;
+  height: 48px;
+  border-radius: 24px;
+}
+
+.thread-title {
+  float: right;
+  line-height: 64px;
+  width: 248px;
+  text-overflow: ellipsis;
+  text-align: left;
+}

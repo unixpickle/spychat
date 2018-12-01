@@ -3,8 +3,20 @@
   <head>
     <meta charset="utf-8">
     <title>SpyChat</title>
+    <script src="assets/js/messages.js"></script>
+    <script src="assets/js/thread_list.js"></script>
+    <script src="assets/js/app.js"></script>
+    <link rel="stylesheet" href="assets/css/generic.css" type="text/css">
+    <link rel="stylesheet" href="assets/css/app.css" type="text/css">
+    <link rel="stylesheet" href="assets/css/thread_list.css" type="text/css">
+    <link rel="stylesheet" href="assets/css/messages.css" type="text/css">
   </head>
   <body>
-    Welcome to SpyChat.
+    <div id="thread-list" class="loading">
+      <div class="loader"></div>
+      <div class="error"></div>
+      <ol class="threads"></ol>
+    </div>
+    <div id="messages"></div>
   </body>
 </html>

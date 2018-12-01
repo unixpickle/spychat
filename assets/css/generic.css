@@ -1,0 +1,29 @@
+.loader {
+  display: block;
+  width: 20px;
+  height: 20px;
+  color: transparent;
+  font-size: 0;
+
+  background-image: url(../svg/loader.svg);
+  background-size: 100% 100%;
+
+  animation-name: rotate;
+  animation-duration: 1s;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.error {
+  color: red;
+}

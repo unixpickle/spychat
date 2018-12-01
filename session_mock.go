@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"io/ioutil"
+	"time"
 
 	"github.com/unixpickle/essentials"
 	"github.com/unixpickle/fbmsgr"
@@ -32,10 +33,12 @@ func (m *mockSession) Login(username, password string) error {
 }
 
 func (m *mockSession) Threads() ([]*fbmsgr.ThreadInfo, error) {
+	time.Sleep(time.Second)
 	return m.ThreadsResult, nil
 }
 
 func (m *mockSession) Thread(id string) ([]fbmsgr.Action, error) {
+	time.Sleep(time.Second)
 	res := make([]fbmsgr.Action, len(m.ThreadResult))
 	for i, x := range m.ThreadResult {
 		res[i] = x
