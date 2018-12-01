@@ -67,3 +67,7 @@
 .message-attachment-image, .message-attachment-audio, .message-attachment-video {
   max-width: 90%;
 }
+
+.message-attachment-sticker {
+  width: 100px;
+}

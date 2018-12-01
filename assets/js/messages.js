@@ -56,7 +56,7 @@ class Messages extends LoadableView {
           attachElem.target = '_blank';
         } else if (attachment['StickerID']) {
           attachElem = document.createElement('img');
-          attachElem.className = 'message-attachment-image';
+          attachElem.className = 'message-attachment-sticker';
           attachElem.src = attachment['RawURL'];
         }
         if (attachElem) {
