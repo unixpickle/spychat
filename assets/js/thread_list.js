@@ -1,0 +1,4 @@
+class ThreadList {
+    constructor() {
+    }
+}
