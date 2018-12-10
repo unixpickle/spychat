@@ -1,6 +1,6 @@
 #messages {
   position: fixed;
-  height: 100%;
+  height: calc(100% - 50px);
   top: 50px;
   right: 0;
   box-sizing: border-box;
