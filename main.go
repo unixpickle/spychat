@@ -42,6 +42,7 @@ func main() {
 	handlers := map[string]http.HandlerFunc{
 		"/":        server.HandleRoot,
 		"/login":   server.HandleLogin,
+		"/logout":  server.HandleLogout,
 		"/threads": server.HandleThreads,
 		"/thread":  server.HandleThread,
 	}
@@ -99,6 +100,18 @@ func (s *Server) HandleLogin(w http.ResponseWriter, r *http.Request) {
 	}
 
 	s.serveTemplate(w, "login", map[string]string{"error": r.FormValue("error")})
+}
+
+func (s *Server) HandleLogout(w http.ResponseWriter, r *http.Request) {
+	if s.authenticated(r) {
+		sess, _ := s.CookieStore.Get(r, "sessid")
+		id := sess.Values["id"].(int64)
+		s.SessionTable.Del(id)
+		delete(sess.Values, "id")
+		delete(sess.Values, "authenticated")
+		sess.Save(r, w)
+	}
+	http.Redirect(w, r, "/login", http.StatusSeeOther)
 }
 
 func (s *Server) HandleThreads(w http.ResponseWriter, r *http.Request) {

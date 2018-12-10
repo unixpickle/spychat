@@ -1,7 +1,7 @@
 #thread-list {
   position: fixed;
   height: 100%;
-  top: 0;
+  top: 50px;
   left: 0;
   box-sizing: border-box;
   overflow-y: scroll;
